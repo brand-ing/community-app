@@ -1,0 +1,7 @@
+{
+  "AUTH0_DOMAIN": "your-tenant.us.auth0.com",
+  "AUTH0_CLIENT_ID": "paste-the-client-id-of-your-Single-Page-Application",
+  "API_AUDIENCE": "https://starter-api",
+  "API_BASE_URL": "http://localhost:8080",
+  "APP_SCHEME": "starterapp"
+}
