@@ -2,6 +2,10 @@ import 'package:auth0_flutter/auth0_flutter.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'service_choices.dart';
+import '../utils/display_name.dart';
+import '../widgets/theme_toggle_button.dart';
+import 'angel_chat_screen.dart';
+import 'volunteer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen(
@@ -19,7 +23,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context) => AlertDialog(
               title: const Text('Your profile'),
               content: Text(
-                  '${user?.name ?? 'Community member'}\n${user?.email ?? ''}'),
+                  '${firstName(user?.name, fallback: 'Community member')}\n${user?.email ?? ''}'),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -33,6 +37,7 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('AngelNest'), actions: [
+        const ThemeToggleButton(),
         IconButton(
             onPressed: () => _showProfile(context),
             tooltip: 'Your profile',
@@ -76,8 +81,7 @@ class HomeScreen extends StatelessWidget {
                               color: theme.colorScheme.primary, size: 22),
                           const SizedBox(width: 10),
                           Expanded(
-                              child: Text(
-                                  'Welcome, ${user?.name ?? 'neighbor'}.',
+                              child: Text('Welcome, ${firstName(user?.name)}.',
                                   style: theme.textTheme.titleMedium)),
                         ]),
                         const SizedBox(height: 20),
@@ -101,19 +105,30 @@ class HomeScreen extends StatelessWidget {
                     style: theme.textTheme.bodyLarge
                         ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 24),
-                ServiceChoices(
-                    onSelect: (index) => showDialog<void>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: Text(communityServices[index].title),
-                              content: const Text(
-                                  'This is the start of your journey. Community listings and requests are coming in a future version of AngelNest.'),
-                              actions: [
-                                TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Back to community'))
-                              ],
-                            ))),
+                ServiceChoices(onSelect: (index) {
+                  if (index == 0) {
+                    Navigator.of(context).push(MaterialPageRoute<void>(
+                        builder: (_) => const VolunteerScreen()));
+                    return;
+                  }
+                  if (index == 1) {
+                    Navigator.of(context).push(MaterialPageRoute<void>(
+                        builder: (_) => AngelChatScreen(userName: user?.name)));
+                    return;
+                  }
+                  showDialog<void>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text(communityServices[index].title),
+                            content: const Text(
+                                'This is the start of your journey. Community listings and requests are coming in a future version of AngelNest.'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Back to community'))
+                            ],
+                          ));
+                }),
               ],
             )),
       )))),

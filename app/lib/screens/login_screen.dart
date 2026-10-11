@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/theme_toggle_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen(
@@ -12,6 +13,7 @@ class LoginScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+          actions: const [ThemeToggleButton()],
           leading: IconButton(
               onPressed: onBack,
               tooltip: 'Back to AngelNest',

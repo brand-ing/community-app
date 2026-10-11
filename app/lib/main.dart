@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'config.dart';
+import 'widgets/theme_toggle_button.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/product_screen.dart';
@@ -9,17 +10,37 @@ import 'services/auth_service.dart';
 
 void main() => runApp(const StarterApp());
 
-class StarterApp extends StatelessWidget {
+class StarterApp extends StatefulWidget {
   const StarterApp({super.key});
 
   @override
+  State<StarterApp> createState() => _StarterAppState();
+}
+
+class _StarterAppState extends State<StarterApp> {
+  ThemeMode _mode = ThemeMode.system;
+
+  void _toggleTheme() {
+    final isDark = _mode == ThemeMode.dark ||
+        (_mode == ThemeMode.system &&
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark);
+    setState(() => _mode = isDark ? ThemeMode.light : ThemeMode.dark);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AngelNest',
-      debugShowCheckedModeBanner: false,
-      theme: _angelTheme(Brightness.light),
-      darkTheme: _angelTheme(Brightness.dark),
-      home: const AuthGate(),
+    return AppThemeScope(
+      mode: _mode,
+      onToggle: _toggleTheme,
+      child: MaterialApp(
+        title: 'AngelNest',
+        debugShowCheckedModeBanner: false,
+        theme: _angelTheme(Brightness.light),
+        darkTheme: _angelTheme(Brightness.dark),
+        themeMode: _mode,
+        home: const AuthGate(),
+      ),
     );
   }
 }
