@@ -1,11 +1,11 @@
 {
-    "name": "starter_app",
-    "short_name": "starter_app",
+    "name": "Angel’s Nest",
+    "short_name": "Angel’s Nest",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#10357C",
+    "theme_color": "#10357C",
+    "description": "Making Living Easier.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

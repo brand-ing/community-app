@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'config.dart';
+import 'theme/angel_theme.dart';
 import 'widgets/theme_toggle_button.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -34,58 +35,15 @@ class _StarterAppState extends State<StarterApp> {
       mode: _mode,
       onToggle: _toggleTheme,
       child: MaterialApp(
-        title: 'AngelNest',
+        title: 'Angel’s Nest',
         debugShowCheckedModeBanner: false,
-        theme: _angelTheme(Brightness.light),
-        darkTheme: _angelTheme(Brightness.dark),
+        theme: buildAngelTheme(Brightness.light),
+        darkTheme: buildAngelTheme(Brightness.dark),
         themeMode: _mode,
         home: const AuthGate(),
       ),
     );
   }
-}
-
-ThemeData _angelTheme(Brightness brightness) {
-  final isLight = brightness == Brightness.light;
-  final scheme = ColorScheme.fromSeed(
-    seedColor: const Color(0xFFAD7045),
-    brightness: brightness,
-  ).copyWith(
-    primary: isLight ? const Color(0xFF87502D) : const Color(0xFFF3BC91),
-    primaryContainer:
-        isLight ? const Color(0xFFFFE8D5) : const Color(0xFF59381F),
-    secondary: isLight ? const Color(0xFF796020) : const Color(0xFFE6CB84),
-    secondaryContainer:
-        isLight ? const Color(0xFFF8EDCA) : const Color(0xFF51421D),
-    tertiary: isLight ? const Color(0xFF935E57) : const Color(0xFFF0BDB4),
-    tertiaryContainer:
-        isLight ? const Color(0xFFFBE5DF) : const Color(0xFF573B36),
-    surface: isLight ? const Color(0xFFFFFCF7) : const Color(0xFF211B17),
-    onSurface: isLight ? const Color(0xFF3D3028) : const Color(0xFFF3E7DD),
-    onSurfaceVariant:
-        isLight ? const Color(0xFF716158) : const Color(0xFFD2C0B4),
-    outlineVariant: isLight ? const Color(0xFFEADDD0) : const Color(0xFF51443B),
-  );
-  return ThemeData(
-    useMaterial3: true,
-    colorScheme: scheme,
-    scaffoldBackgroundColor:
-        isLight ? const Color(0xFFFBF5EB) : const Color(0xFF191511),
-    appBarTheme: AppBarTheme(
-      backgroundColor: scheme.surface,
-      foregroundColor: scheme.onSurface,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-    )),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-    )),
-  );
 }
 
 /// Decides which screen to show: login, or the app.
@@ -146,7 +104,7 @@ class _AuthGateState extends State<AuthGate> {
       onLogin: () {
         if (!Config.isConfigured) {
           setState(() => _error =
-              'Sign-in is not configured yet. Please ask the AngelNest team to enable it.');
+              'Sign-in is not configured yet. Please ask the Angel’s Nest team to enable it.');
           return;
         }
         _run(_auth.login);

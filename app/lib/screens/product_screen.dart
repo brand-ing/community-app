@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'service_choices.dart';
+import '../widgets/nest_brand.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class ProductScreen extends StatelessWidget {
@@ -11,7 +12,7 @@ class ProductScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
-        appBar: AppBar(title: const Text('AngelNest'), actions: [
+        appBar: AppBar(title: const NestWordmark(), actions: [
           const ThemeToggleButton(),
           Padding(
               padding: const EdgeInsets.only(right: 12),
@@ -31,19 +32,31 @@ class ProductScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const NestWordmark(large: true),
+                  const SizedBox(height: 12),
+                  Text('Making Living Easier',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                          letterSpacing: 2,
+                          color: theme.colorScheme.onSurfaceVariant)),
+                  const SizedBox(height: 24),
                   Chip(
                       avatar: Icon(Icons.favorite_outline,
                           color: theme.colorScheme.primary),
                       label: const Text('Small acts. Stronger communities.')),
                   const SizedBox(height: 28),
                   Text('A place to help.\nA place to belong.',
-                      style: theme.textTheme.displayMedium),
+                      style: constraints.maxWidth < 600
+                          ? theme.textTheme.displaySmall
+                          : theme.textTheme.displayMedium),
                   const SizedBox(height: 24),
                   ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 640),
                       child: Text(
-                        'AngelNest brings people back into community. Volunteer your time, ask for a helping hand, or exchange skills with people around you.',
-                        style: theme.textTheme.titleLarge,
+                        'Angel’s Nest brings people back into community. Volunteer your time, ask for a helping hand, or exchange skills with people around you.',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 18,
+                            height: 1.6,
+                            color: theme.colorScheme.onSurfaceVariant),
                       )),
                   const SizedBox(height: 28),
                   FilledButton.icon(
@@ -52,7 +65,9 @@ class ProductScreen extends StatelessWidget {
                       label: const Text('Find your place in the community')),
                   const SizedBox(height: 12),
                   const Text('Sign in or create an account to get started.'),
-                  const SizedBox(height: 64),
+                  const SizedBox(height: 32),
+                  const NestQuote(),
+                  const SizedBox(height: 40),
                   Text('Three ways to connect',
                       style: theme.textTheme.headlineMedium),
                   const SizedBox(height: 12),
@@ -75,11 +90,12 @@ class ProductScreen extends StatelessWidget {
                               const SizedBox(height: 20),
                               OutlinedButton(
                                   onPressed: onContinue,
-                                  child: const Text('Continue to AngelNest')),
+                                  child:
+                                      const Text('Continue to Angel’s Nest')),
                             ],
                           ))),
                   const SizedBox(height: 32),
-                  const Text('AngelNest · People helping people.'),
+                  const Text('Angel’s Nest · People helping people.'),
                 ],
               )),
         )))),

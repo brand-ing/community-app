@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starter_app/main.dart';
+import 'package:starter_app/theme/angel_theme.dart';
 import 'package:starter_app/screens/angel_chat_screen.dart';
 import 'package:starter_app/screens/home_screen.dart';
 import 'package:starter_app/screens/volunteer_screen.dart';
@@ -23,7 +24,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
         ThemeMode.light);
-    await tester.tap(find.byTooltip('Back to AngelNest'));
+    await tester.tap(find.byTooltip('Back to Angel’s Nest'));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Switch to dark mode'), findsOneWidget);
   });
@@ -78,35 +79,55 @@ void main() {
     await tester.tap(find.text('Continue to the app'));
     await tester.pumpAndSettle();
     expect(find.text('Sign in / Register'), findsOneWidget);
-    await tester.tap(find.byTooltip('Back to AngelNest'));
+    await tester.tap(find.byTooltip('Back to Angel’s Nest'));
     await tester.pumpAndSettle();
     expect(find.text('Three ways to connect'), findsOneWidget);
   });
-  for (final width in [320.0, 768.0, 1440.0]) {
-    testWidgets('Screens fit width $width', (tester) async {
-      await tester.binding.setSurfaceSize(Size(width, 900));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-      await tester
-          .pumpWidget(MaterialApp(home: ProductScreen(onContinue: () {})));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(MaterialApp(
-          home: HomeScreen(
-              user: null, api: ApiService(() => null), onLogout: () {})));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.text('I want to volunteer'));
-      await tester.tap(find.text('I want to volunteer'));
-      await tester.pumpAndSettle();
-      expect(find.text('Volunteer offerings'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('I need help'));
-      await tester.tap(find.text('I need help'));
-      await tester.pumpAndSettle();
-      expect(find.text('How can I help you today, neighbor?'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+  for (final brightness in Brightness.values) {
+    for (final width in [320.0, 768.0, 1440.0]) {
+      testWidgets('$brightness screens fit width $width', (tester) async {
+        await tester.binding.setSurfaceSize(Size(width, 900));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await tester.pumpWidget(MaterialApp(
+            theme: buildAngelTheme(brightness),
+            home: ProductScreen(onContinue: () {})));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(MaterialApp(
+            theme: buildAngelTheme(brightness),
+            home: HomeScreen(
+                user: null, api: ApiService(() => null), onLogout: () {})));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('Making Living Easier'), findsOneWidget);
+        await tester.ensureVisible(find.text('Community'));
+        await tester.tap(find.text('Community'));
+        await tester.pumpAndSettle();
+        expect(find.text('Progress Over Perfection'), findsOneWidget);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        expect(find.text('Quick money options'), findsNothing);
+        expect(find.text('Chat with Angel'), findsNothing);
+        await tester.ensureVisible(find.text('I want to volunteer'));
+        await tester.tap(find.text('I want to volunteer'));
+        await tester.pumpAndSettle();
+        expect(find.text('Volunteer offerings'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('I need help'));
+        await tester.tap(find.text('I need help'));
+        await tester.pumpAndSettle();
+        expect(
+            find.text('How can I help you today, neighbor?'), findsOneWidget);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Service Exchange'));
+        await tester.tap(find.text('Service Exchange'));
+        await tester.pumpAndSettle();
+        expect(find.text('A skill for a skill.'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
   }
 }

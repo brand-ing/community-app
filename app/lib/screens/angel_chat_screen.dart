@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/display_name.dart';
+import '../theme/angel_theme.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class AngelChatScreen extends StatefulWidget {
@@ -60,6 +61,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final palette = NestPalette.of(context);
     return Scaffold(
       appBar: AppBar(
           title: const Text('Chat with Angel'),
@@ -82,7 +84,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
                             shape: BoxShape.circle,
                             gradient: LinearGradient(colors: [
                               colors.primaryContainer,
-                              colors.secondaryContainer
+                              colors.tertiaryContainer
                             ]),
                             border: Border.all(color: colors.outlineVariant),
                           ),
@@ -138,9 +140,9 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   color: message.fromAngel
-                                      ? colors.surface
-                                      : colors.primaryContainer,
-                                  borderRadius: BorderRadius.circular(24),
+                                      ? palette.quote
+                                      : colors.tertiaryContainer,
+                                  borderRadius: BorderRadius.circular(18),
                                   border:
                                       Border.all(color: colors.outlineVariant),
                                 ),
@@ -167,7 +169,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: colors.surface,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: colors.outlineVariant),
                   boxShadow: [
                     BoxShadow(
@@ -187,6 +189,8 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Tell Angel what is on your mind...',
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),

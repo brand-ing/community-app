@@ -1,138 +1,139 @@
 import 'package:flutter/material.dart';
+import '../theme/angel_theme.dart';
 
 const communityServices = [
   (
     title: 'I want to volunteer',
-    description:
-        'Give a little time. Make a real difference for someone nearby.',
-    icon: Icons.volunteer_activism_outlined,
-    label: 'GIVE YOUR TIME',
-    action: 'Explore volunteering',
+    description: 'Explore ways to support your community.',
+    icon: Icons.favorite_border_rounded
   ),
   (
     title: 'I need help',
-    description:
-        'You do not have to do it all alone. Reach out to your community.',
-    icon: Icons.favorite_border_rounded,
-    label: 'FIND YOUR SUPPORT',
-    action: 'Find a helping hand',
+    description: 'Find a helping hand. Talk with Angel about what you need.',
+    icon: Icons.search_rounded
   ),
   (
     title: 'Service Exchange',
-    description:
-        'Share what you know. Find someone whose skills complement yours.',
-    icon: Icons.swap_horiz_rounded,
-    label: 'SHARE YOUR SKILLS',
-    action: 'Discover exchanges',
+    description: 'Give a skill and get help from someone in your community.',
+    icon: Icons.swap_horiz_rounded
   ),
 ];
 
 class ServiceChoices extends StatelessWidget {
   const ServiceChoices({super.key, this.onSelect});
   final ValueChanged<int>? onSelect;
-
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth >= 850) {
-        return IntrinsicHeight(
-            child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (var i = 0; i < communityServices.length; i++) ...[
-              if (i > 0) const SizedBox(width: 20),
-              Expanded(
-                  child: _ServiceCard(
-                      index: i,
-                      onTap: onSelect == null ? null : () => onSelect!(i))),
-            ],
-          ],
-        ));
-      }
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        for (var i = 0; i < communityServices.length; i++) ...[
-          if (i > 0) const SizedBox(height: 16),
-          _ServiceCard(
-              index: i, onTap: onSelect == null ? null : () => onSelect!(i)),
-        ],
-      ]);
-    });
-  }
+  Widget build(BuildContext context) =>
+      LayoutBuilder(builder: (context, constraints) {
+        if (constraints.maxWidth >= 850) {
+          return IntrinsicHeight(
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                for (var i = 0; i < 3; i++) ...[
+                  if (i > 0) const SizedBox(width: 16),
+                  Expanded(
+                      child: _Choice(
+                          index: i,
+                          compact: false,
+                          onTap: onSelect == null ? null : () => onSelect!(i)))
+                ]
+              ]));
+        }
+        return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < 3; i++) ...[
+                if (i > 0) const SizedBox(height: 14),
+                _Choice(
+                    index: i,
+                    compact: true,
+                    onTap: onSelect == null ? null : () => onSelect!(i))
+              ]
+            ]);
+      });
 }
 
-class _ServiceCard extends StatelessWidget {
-  const _ServiceCard({required this.index, this.onTap});
-  final int index;
-  final VoidCallback? onTap;
+class CommunityChoice extends StatelessWidget {
+  const CommunityChoice({super.key, required this.onTap});
+  final VoidCallback onTap;
 
+  @override
+  Widget build(BuildContext context) => _Choice(
+        index: 3,
+        compact: true,
+        onTap: onTap,
+        item: (
+          title: 'Community',
+          description:
+              'Read stories, share a thought, and connect with your community.',
+          icon: Icons.groups_outlined,
+        ),
+      );
+}
+
+class _Choice extends StatelessWidget {
+  const _Choice(
+      {required this.index, required this.compact, this.onTap, this.item});
+  final ({String title, String description, IconData icon})? item;
+  final int index;
+  final bool compact;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final service = communityServices[index];
-    final accents = [colors.primary, colors.tertiary, colors.secondary];
-    final containers = [
-      colors.primaryContainer,
-      colors.tertiaryContainer,
-      colors.secondaryContainer
-    ];
-    final accent = accents[index];
+    final palette = NestPalette.of(context);
+    final item = this.item ?? communityServices[index];
+    final icon = Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: palette.accents[index].withAlpha(20)),
+        child: Icon(item.icon, color: palette.accents[index], size: 30));
+    final words =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(item.title,
+          style: theme.textTheme.titleLarge?.copyWith(fontSize: 20)),
+      const SizedBox(height: 6),
+      Text(item.description,
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant))
+    ]);
     return Card(
-      margin: EdgeInsets.zero,
-      elevation: 0,
-      color: colors.surface,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(color: colors.outlineVariant)),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                        color: containers[index],
-                        borderRadius: BorderRadius.circular(24)),
-                    child: Icon(service.icon, size: 34, color: accent),
-                  ),
-                  const SizedBox(height: 28),
-                  Text(service.label,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                          color: accent,
-                          letterSpacing: 1.5,
-                          fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 12),
-                  Text(service.title,
-                      style: theme.textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 14),
-                  Text(service.description,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                          color: colors.onSurfaceVariant, height: 1.6)),
-                ]),
-                if (onTap != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 32),
-                    child: Row(children: [
-                      Expanded(
-                          child: Text(service.action,
-                              style: theme.textTheme.labelLarge
-                                  ?.copyWith(color: accent))),
-                      const SizedBox(width: 8),
-                      Icon(Icons.arrow_forward_rounded,
-                          size: 20, color: accent),
-                    ]),
-                  ),
-              ],
-            )),
-      ),
-    );
+        margin: EdgeInsets.zero,
+        elevation: 0,
+        color: palette.tints[index],
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: palette.accents[index].withAlpha(75))),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+            onTap: onTap,
+            child: Padding(
+                padding: EdgeInsets.all(compact ? 16 : 24),
+                child: compact
+                    ? Row(children: [
+                        icon,
+                        const SizedBox(width: 16),
+                        Expanded(child: words),
+                        if (onTap != null) ...[
+                          const SizedBox(width: 8),
+                          Icon(Icons.chevron_right,
+                              color: palette.accents[index])
+                        ]
+                      ])
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                            icon,
+                            const SizedBox(height: 20),
+                            words,
+                            if (onTap != null) ...[
+                              const SizedBox(height: 24),
+                              Icon(Icons.arrow_forward_rounded,
+                                  color: palette.accents[index])
+                            ]
+                          ]))));
   }
 }

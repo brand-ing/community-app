@@ -65,14 +65,20 @@ const _opportunities = [
 ];
 
 class VolunteerScreen extends StatefulWidget {
-  const VolunteerScreen({super.key});
+  const VolunteerScreen({super.key, this.initialCategory = 'Volunteer'});
+  final String initialCategory;
 
   @override
   State<VolunteerScreen> createState() => _VolunteerScreenState();
 }
 
 class _VolunteerScreenState extends State<VolunteerScreen> {
-  String _category = 'Volunteer';
+  late String _category;
+  @override
+  void initState() {
+    super.initState();
+    _category = widget.initialCategory;
+  }
 
   void _showDetails(int index) {
     final opportunity = _opportunities[index];
@@ -118,7 +124,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
       margin: EdgeInsets.zero,
       elevation: 0,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: theme.colorScheme.outlineVariant)),
       child: Padding(
           padding: const EdgeInsets.all(20),
@@ -202,7 +208,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
               margin: EdgeInsets.zero,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(16),
                   side: BorderSide(color: colors.outlineVariant)),
               child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -262,12 +268,12 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
             padding: const EdgeInsets.all(24),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Good things start with you.',
+              Text('Quick Opportunities',
                   style: theme.textTheme.headlineLarge
                       ?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
               Text(
-                  'Find a way to lend a hand, or explore paid tasks in your community.',
+                  'Short-term tasks, ways to support your community, and opportunities to earn.',
                   style: theme.textTheme.bodyLarge),
               const SizedBox(height: 24),
               Container(
