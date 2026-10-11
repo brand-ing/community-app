@@ -1,71 +1,11 @@
 import 'package:flutter/material.dart';
 import '../widgets/theme_toggle_button.dart';
-
-const _opportunities = [
-  (
-    title: 'Lend a hand at a community garden',
-    host: 'Neighborhood garden team',
-    category: 'Volunteer',
-    time: 'Weekend mornings',
-    location: 'In person',
-    description:
-        'Help plant, water, and care for a shared green space. No gardening experience needed.',
-    icon: Icons.local_florist_outlined
-  ),
-  (
-    title: 'Pack meals for neighbors',
-    host: 'Community pantry',
-    category: 'Volunteer',
-    time: '2-hour shifts',
-    location: 'In person',
-    description:
-        'Sort donations and prepare food packages alongside other volunteers.',
-    icon: Icons.restaurant_outlined
-  ),
-  (
-    title: 'Be a friendly check-in buddy',
-    host: 'Neighbor connection group',
-    category: 'Volunteer',
-    time: 'Flexible schedule',
-    location: 'Remote',
-    description:
-        'Make time for a friendly conversation with someone who could use company.',
-    icon: Icons.forum_outlined
-  ),
-  (
-    title: 'Help with a small yard project',
-    host: 'Community member',
-    category: 'Odd jobs',
-    time: 'One-time task',
-    location: 'In person',
-    description:
-        'Offer a helping hand with light yard work. Scope and payment would be agreed with the requester.',
-    icon: Icons.handyman_outlined
-  ),
-  (
-    title: 'Share your knowledge with a learner',
-    host: 'Community member',
-    category: 'Tutoring',
-    time: 'Flexible schedule',
-    location: 'Remote or in person',
-    description:
-        'Help someone practice a subject you know. Session details and payment would be agreed together.',
-    icon: Icons.school_outlined
-  ),
-  (
-    title: 'Take a neighbor\'s dog for a walk',
-    host: 'Community member',
-    category: 'Pet care',
-    time: 'Short visits',
-    location: 'In person',
-    description:
-        'Offer local dog walks or pet check-ins. Responsibilities and payment would be agreed with the owner.',
-    icon: Icons.pets_outlined
-  ),
-];
+import '../services/api_service.dart';
 
 class VolunteerScreen extends StatefulWidget {
-  const VolunteerScreen({super.key, this.initialCategory = 'Volunteer'});
+  const VolunteerScreen(
+      {super.key, required this.api, this.initialCategory = 'Volunteer'});
+  final ApiService api;
   final String initialCategory;
 
   @override
@@ -74,10 +14,40 @@ class VolunteerScreen extends StatefulWidget {
 
 class _VolunteerScreenState extends State<VolunteerScreen> {
   late String _category;
+  List<dynamic> _opportunities = [];
+  bool _loading = true;
+  String? _error;
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final rows = await widget.api.getOpportunities();
+      if (!mounted) return;
+      setState(() => _opportunities = rows
+          .map((r) => (
+                title: r['title'] as String,
+                host: r['host'] as String,
+                category: r['category'] as String,
+                time: r['time'] as String,
+                location: r['location'] as String,
+                description: r['description'] as String,
+                icon: Icons.volunteer_activism_outlined
+              ))
+          .toList());
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _category = widget.initialCategory;
+    _load();
   }
 
   void _showDetails(int index) {
@@ -135,6 +105,8 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
                   style: theme.textTheme.titleMedium),
               const SizedBox(height: 16),
               if (wide) ...[
+                if (!_opportunities.any((o) => o.category == _category))
+                  const Text('No offerings in this category yet.'),
                 for (var i = 0; i < options.length; i++) ...[
                   if (i == 1)
                     Padding(
@@ -185,6 +157,13 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
   Widget _listings(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_error != null) {
+      return Column(children: [
+        Text(_error!),
+        TextButton(onPressed: _load, child: const Text('Retry'))
+      ]);
+    }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
           _category == 'Volunteer'
@@ -200,6 +179,8 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
           style: theme.textTheme.bodyLarge
               ?.copyWith(color: colors.onSurfaceVariant)),
       const SizedBox(height: 20),
+      if (!_opportunities.any((o) => o.category == _category))
+        const Text('No offerings in this category yet.'),
       for (var i = 0; i < _opportunities.length; i++)
         if (_opportunities[i].category == _category)
           Padding(
@@ -283,7 +264,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
                     color: theme.colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(16)),
                 child: const Text(
-                    'Preview listings · These examples show the experience. Live volunteer offerings and paid tasks are not connected yet.'),
+                    'Demo listings · Fictional community offerings. Contact and sign-up are not available yet.'),
               ),
               const SizedBox(height: 28),
               LayoutBuilder(builder: (context, constraints) {

@@ -6,7 +6,7 @@ import 'widgets/theme_toggle_button.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/product_screen.dart';
-import 'services/api_service.dart';
+import 'services/demo_api_service.dart';
 import 'services/auth_service.dart';
 
 void main() => runApp(const StarterApp());
@@ -56,9 +56,10 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   late final _auth = AuthService();
-  late final _api = ApiService(() => _auth.accessToken);
+  late final _api = DemoApiService();
   bool _loading = true;
   bool _enterApp = false;
+  bool _demo = false;
   String? _error;
 
   @override
@@ -89,17 +90,27 @@ class _AuthGateState extends State<AuthGate> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (Config.isConfigured && _auth.isLoggedIn) {
+    if (_demo || (Config.isConfigured && _auth.isLoggedIn)) {
       return HomeScreen(
         user: _auth.user,
         api: _api,
-        onLogout: () => _run(_auth.logout),
+        onLogout: () {
+          if (_demo) {
+            setState(() {
+              _demo = false;
+              _enterApp = false;
+            });
+          } else {
+            _run(_auth.logout);
+          }
+        },
       );
     }
     if (!_enterApp) {
       return ProductScreen(onContinue: () => setState(() => _enterApp = true));
     }
     return LoginScreen(
+      onDemo: () => setState(() => _demo = true),
       onBack: () => setState(() => _enterApp = false),
       onLogin: () {
         if (!Config.isConfigured) {

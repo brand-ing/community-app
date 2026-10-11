@@ -30,7 +30,8 @@ void main() {
   });
   testWidgets('Volunteer menu filters paid tasks and opens details',
       (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: VolunteerScreen()));
+    await tester.pumpWidget(MaterialApp(home: VolunteerScreen(api: TestApi())));
+    await tester.pumpAndSettle();
     expect(find.text('Lend a hand at a community garden'), findsOneWidget);
     await tester.tap(find.text('Tutoring'));
     await tester.pumpAndSettle();
@@ -48,8 +49,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
   testWidgets('Angel greets the user and accepts messages', (tester) async {
-    await tester.pumpWidget(
-        const MaterialApp(home: AngelChatScreen(userName: '  Sam Rivera  ')));
+    await tester.pumpWidget(MaterialApp(
+        home: AngelChatScreen(userName: '  Sam Rivera  ', api: TestApi())));
     expect(find.text('How can I help you today, Sam?'), findsOneWidget);
     expect(
         tester
@@ -95,8 +96,7 @@ void main() {
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(MaterialApp(
             theme: buildAngelTheme(brightness),
-            home: HomeScreen(
-                user: null, api: ApiService(() => null), onLogout: () {})));
+            home: HomeScreen(user: null, api: TestApi(), onLogout: () {})));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
         expect(find.text('Making Living Easier'), findsOneWidget);
@@ -130,4 +130,51 @@ void main() {
       });
     }
   }
+}
+
+class TestApi extends ApiService {
+  TestApi() : super(() => 'test');
+  @override
+  Future<List<Map<String, dynamic>>> getOpportunities() async => [
+        for (final (title, category) in [
+          ('Lend a hand at a community garden', 'Volunteer'),
+          ('Share your knowledge with a learner', 'Tutoring')
+        ])
+          {
+            'title': title,
+            'category': category,
+            'host': 'Demo team',
+            'time': 'Weekends',
+            'location': 'Atlanta',
+            'description': 'Fictional test offering',
+            'isDemo': true
+          }
+      ];
+  @override
+  Future<Map<String, dynamic>> chat(
+          {required String conversationId,
+          required String turnId,
+          required String message}) async =>
+      {
+        'assistantMessage': 'What kind of support would help?',
+        'revision': 1,
+        'draft': {
+          'title': null,
+          'description': null,
+          'category': 'unknown',
+          'location': null,
+          'timing': null,
+          'supportMode': 'unknown',
+          'skillsNeeded': [],
+          'evidence': []
+        },
+        'missingFields': [
+          'title',
+          'description',
+          'category',
+          'timing',
+          'supportMode',
+          'location'
+        ]
+      };
 }

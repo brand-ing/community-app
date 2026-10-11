@@ -21,11 +21,11 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback onLogout;
   void _chat(BuildContext context) =>
       Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => AngelChatScreen(userName: user?.name)));
+          builder: (_) => AngelChatScreen(userName: user?.name, api: api)));
   void _select(BuildContext context, int index) {
     if (index == 0) {
       Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => const VolunteerScreen()));
+          MaterialPageRoute<void>(builder: (_) => VolunteerScreen(api: api)));
     } else if (index == 1) {
       _chat(context);
     } else {
