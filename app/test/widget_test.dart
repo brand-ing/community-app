@@ -1,30 +1,40 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:starter_app/main.dart';
+import 'package:starter_app/screens/home_screen.dart';
+import 'package:starter_app/screens/product_screen.dart';
+import 'package:starter_app/services/api_service.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('Product page opens sign-in and returns', (tester) async {
+    await tester.pumpWidget(const StarterApp());
+    await tester.pumpAndSettle();
+    expect(find.text('Three ways to connect'), findsOneWidget);
+    await tester.tap(find.text('Continue to the app'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sign in / Register'), findsOneWidget);
+    await tester.tap(find.byTooltip('Back to AngelNest'));
+    await tester.pumpAndSettle();
+    expect(find.text('Three ways to connect'), findsOneWidget);
   });
+  for (final width in [320.0, 768.0, 1440.0]) {
+    testWidgets('Screens fit width $width', (tester) async {
+      await tester.binding.setSurfaceSize(Size(width, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester
+          .pumpWidget(MaterialApp(home: ProductScreen(onContinue: () {})));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(MaterialApp(
+          home: HomeScreen(
+              user: null, api: ApiService(() => null), onLogout: () {})));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.text('I want to volunteer'));
+      await tester.tap(find.text('I want to volunteer'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Community listings and requests'),
+          findsOneWidget);
+    });
+  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'config.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/product_screen.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 
@@ -14,18 +15,56 @@ class StarterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Starter App',
+      title: 'AngelNest',
       debugShowCheckedModeBanner: false,
-      // Placeholder look — swap the seed color once we pick a design.
-      theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
-      darkTheme: ThemeData(
-        colorSchemeSeed: Colors.indigo,
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: _angelTheme(Brightness.light),
+      darkTheme: _angelTheme(Brightness.dark),
       home: const AuthGate(),
     );
   }
+}
+
+ThemeData _angelTheme(Brightness brightness) {
+  final isLight = brightness == Brightness.light;
+  final scheme = ColorScheme.fromSeed(
+    seedColor: const Color(0xFFAD7045),
+    brightness: brightness,
+  ).copyWith(
+    primary: isLight ? const Color(0xFF87502D) : const Color(0xFFF3BC91),
+    primaryContainer:
+        isLight ? const Color(0xFFFFE8D5) : const Color(0xFF59381F),
+    secondary: isLight ? const Color(0xFF796020) : const Color(0xFFE6CB84),
+    secondaryContainer:
+        isLight ? const Color(0xFFF8EDCA) : const Color(0xFF51421D),
+    tertiary: isLight ? const Color(0xFF935E57) : const Color(0xFFF0BDB4),
+    tertiaryContainer:
+        isLight ? const Color(0xFFFBE5DF) : const Color(0xFF573B36),
+    surface: isLight ? const Color(0xFFFFFCF7) : const Color(0xFF211B17),
+    onSurface: isLight ? const Color(0xFF3D3028) : const Color(0xFFF3E7DD),
+    onSurfaceVariant:
+        isLight ? const Color(0xFF716158) : const Color(0xFFD2C0B4),
+    outlineVariant: isLight ? const Color(0xFFEADDD0) : const Color(0xFF51443B),
+  );
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: scheme,
+    scaffoldBackgroundColor:
+        isLight ? const Color(0xFFFBF5EB) : const Color(0xFF191511),
+    appBarTheme: AppBarTheme(
+      backgroundColor: scheme.surface,
+      foregroundColor: scheme.onSurface,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+    )),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+    )),
+  );
 }
 
 /// Decides which screen to show: login, or the app.
@@ -37,15 +76,20 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-  final _auth = AuthService();
+  late final _auth = AuthService();
   late final _api = ApiService(() => _auth.accessToken);
   bool _loading = true;
+  bool _enterApp = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _run(_auth.init);
+    if (Config.isConfigured) {
+      _run(_auth.init);
+    } else {
+      _loading = false;
+    }
   }
 
   Future<void> _run(Future<void> Function() action) async {
@@ -63,29 +107,30 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.isConfigured) {
-      return const Scaffold(
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'Missing Auth0 settings.\n\nRun with:\nflutter run --dart-define-from-file=config.json',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      );
-    }
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (_auth.isLoggedIn) {
+    if (Config.isConfigured && _auth.isLoggedIn) {
       return HomeScreen(
         user: _auth.user,
         api: _api,
         onLogout: () => _run(_auth.logout),
       );
     }
-    return LoginScreen(onLogin: () => _run(_auth.login), error: _error);
+    if (!_enterApp) {
+      return ProductScreen(onContinue: () => setState(() => _enterApp = true));
+    }
+    return LoginScreen(
+      onBack: () => setState(() => _enterApp = false),
+      onLogin: () {
+        if (!Config.isConfigured) {
+          setState(() => _error =
+              'Sign-in is not configured yet. Please ask the AngelNest team to enable it.');
+          return;
+        }
+        _run(_auth.login);
+      },
+      error: _error,
+    );
   }
 }
