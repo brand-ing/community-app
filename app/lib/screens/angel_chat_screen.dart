@@ -5,9 +5,11 @@ import '../theme/angel_theme.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class AngelChatScreen extends StatefulWidget {
-  const AngelChatScreen({super.key, this.userName, required this.api});
+  const AngelChatScreen(
+      {super.key, this.userName, required this.api, this.initialMessage});
   final ApiService api;
   final String? userName;
+  final String? initialMessage;
 
   @override
   State<AngelChatScreen> createState() => _AngelChatScreenState();
@@ -24,6 +26,17 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
   Map<String, dynamic>? _response;
   bool _busy = false;
   bool _saved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final message = widget.initialMessage?.trim();
+    if (message != null && message.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _send(message);
+      });
+    }
+  }
 
   String get _name => firstName(widget.userName);
 

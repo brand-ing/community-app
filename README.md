@@ -31,7 +31,7 @@ Flutter opens Chrome. If it does not, visit **http://localhost:3000**. Keep the 
 ### What to click
 
 1. On the product page choose **Continue to the app**.
-2. On the sign-in page choose **Explore the demo**. No account is required.
+2. You enter the app directly as **neighbor**. Sign-in is optional through the account button; no account is required.
 3. **I want to volunteer:** browse fictional community offerings and the category menu; open a listing's details.
 4. **I need help:** open Chat with Angel. Type `Help with my garden`, then `Saturday morning`, then `Midtown Atlanta`. Expand **Review your request** and choose **Confirm demo request**. Replies are scripted to demonstrate intake; this is not live Gemini inference. The demo keeps your entered details in memory and resets on reload.
 5. **Service Exchange:** explore creating an offer with an expiration, proposing a trade, comparing offerings, and accepting or declining within the mockup.

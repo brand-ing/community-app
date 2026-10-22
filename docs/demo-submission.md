@@ -9,7 +9,7 @@ cd C:\Users\epice\Projects\AngelNest\app
 flutter run -d chrome --web-port 3000 --dart-define-from-file=config.json
 ```
 
-On the product page choose Continue to the app, then Explore the demo. Existing signed-in sessions can also use the same mock screens. You do not need to start the backend or configure Tiger Data/Gemini to use the demo.
+On the product page choose Continue to the app. Guests enter directly as neighbor; the account button offers optional sign-in. Existing signed-in sessions can also use the same mock screens. You do not need to start the backend or configure Tiger Data/Gemini to use the demo.
 
 Presentation path:
 1. Open I want to volunteer and browse categories.

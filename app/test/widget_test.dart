@@ -73,16 +73,20 @@ void main() {
         isEmpty);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('Product page opens sign-in and returns', (tester) async {
+  testWidgets('Guests enter directly and sign-in is optional', (tester) async {
     await tester.pumpWidget(const StarterApp());
     await tester.pumpAndSettle();
     expect(find.text('Three ways to connect'), findsOneWidget);
     await tester.tap(find.text('Continue to the app'));
     await tester.pumpAndSettle();
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.textContaining('neighbor'), findsWidgets);
+    await tester.tap(find.byTooltip('Sign in (optional)'));
+    await tester.pumpAndSettle();
     expect(find.text('Sign in / Register'), findsOneWidget);
     await tester.tap(find.byTooltip('Back to Angel’s Nest'));
     await tester.pumpAndSettle();
-    expect(find.text('Three ways to connect'), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
   });
   for (final brightness in Brightness.values) {
     for (final width in [320.0, 768.0, 1440.0]) {

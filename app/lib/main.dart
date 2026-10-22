@@ -59,7 +59,7 @@ class _AuthGateState extends State<AuthGate> {
   late final _api = DemoApiService();
   bool _loading = true;
   bool _enterApp = false;
-  bool _demo = false;
+  bool _showLogin = false;
   String? _error;
 
   @override
@@ -90,35 +90,35 @@ class _AuthGateState extends State<AuthGate> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (_demo || (Config.isConfigured && _auth.isLoggedIn)) {
+    if (!_showLogin &&
+        (_enterApp || (Config.isConfigured && _auth.isLoggedIn))) {
       return HomeScreen(
         user: _auth.user,
         api: _api,
-        onLogout: () {
-          if (_demo) {
-            setState(() {
-              _demo = false;
-              _enterApp = false;
-            });
-          } else {
-            _run(_auth.logout);
-          }
-        },
+        onLogin: () => setState(() => _showLogin = true),
+        onBack: () => setState(() => _enterApp = false),
+        onLogout: () => _run(_auth.logout),
       );
     }
-    if (!_enterApp) {
+    if (!_showLogin) {
       return ProductScreen(onContinue: () => setState(() => _enterApp = true));
     }
     return LoginScreen(
-      onDemo: () => setState(() => _demo = true),
-      onBack: () => setState(() => _enterApp = false),
+      onDemo: () => setState(() {
+        _showLogin = false;
+        _enterApp = true;
+      }),
+      onBack: () => setState(() => _showLogin = false),
       onLogin: () {
         if (!Config.isConfigured) {
           setState(() => _error =
               'Sign-in is not configured yet. Please ask the Angel’s Nest team to enable it.');
           return;
         }
-        _run(_auth.login);
+        _run(() async {
+          await _auth.login();
+          if (mounted) setState(() => _showLogin = false);
+        });
       },
       error: _error,
     );
