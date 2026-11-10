@@ -6,7 +6,7 @@ import 'widgets/theme_toggle_button.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/product_screen.dart';
-import 'services/demo_api_service.dart';
+import 'services/api_service.dart';
 import 'services/auth_service.dart';
 
 void main() => runApp(const StarterApp());
@@ -56,7 +56,7 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   late final _auth = AuthService();
-  late final _api = DemoApiService();
+  late final _api = ApiService(() => _auth.accessToken);
   bool _loading = true;
   bool _enterApp = false;
   bool _showLogin = false;
@@ -104,10 +104,6 @@ class _AuthGateState extends State<AuthGate> {
       return ProductScreen(onContinue: () => setState(() => _enterApp = true));
     }
     return LoginScreen(
-      onDemo: () => setState(() {
-        _showLogin = false;
-        _enterApp = true;
-      }),
       onBack: () => setState(() => _showLogin = false),
       onLogin: () {
         if (!Config.isConfigured) {

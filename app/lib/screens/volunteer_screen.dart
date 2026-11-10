@@ -4,8 +4,12 @@ import '../services/api_service.dart';
 
 class VolunteerScreen extends StatefulWidget {
   const VolunteerScreen(
-      {super.key, required this.api, this.initialCategory = 'Volunteer'});
+      {super.key,
+      required this.api,
+      this.initialCategory = 'Volunteer',
+      this.requiresSignIn = false});
   final ApiService api;
+  final bool requiresSignIn;
   final String initialCategory;
 
   @override
@@ -47,7 +51,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
   void initState() {
     super.initState();
     _category = widget.initialCategory;
-    _load();
+    if (!widget.requiresSignIn) _load();
   }
 
   void _showDetails(int index) {
@@ -66,8 +70,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
                   const SizedBox(height: 20),
                   Text(opportunity.description),
                   const SizedBox(height: 20),
-                  const Text(
-                      'Example listing. Contact and sign-up will be available when live community listings are connected.'),
+                  const Text('Contact and sign-up are not available yet.'),
                 ],
               )),
               actions: [
@@ -236,6 +239,17 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (widget.requiresSignIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('I want to volunteer')),
+        body: const Center(
+            child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text('Sign in to view volunteer listings.',
+              textAlign: TextAlign.center),
+        )),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
           title: const Text('I want to volunteer'),
@@ -263,8 +277,7 @@ class _VolunteerScreenState extends State<VolunteerScreen> {
                 decoration: BoxDecoration(
                     color: theme.colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(16)),
-                child: const Text(
-                    'Demo listings · Fictional community offerings. Contact and sign-up are not available yet.'),
+                child: const Text('Contact and sign-up are not available yet.'),
               ),
               const SizedBox(height: 28),
               LayoutBuilder(builder: (context, constraints) {

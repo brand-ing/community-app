@@ -5,14 +5,10 @@ import '../widgets/theme_toggle_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen(
-      {super.key,
-      required this.onLogin,
-      required this.onBack,
-      this.onDemo,
-      this.error});
+      {super.key, required this.onLogin, required this.onBack, this.error});
   final VoidCallback onLogin;
   final VoidCallback onBack;
-  final VoidCallback? onDemo;
+
   final String? error;
   @override
   Widget build(BuildContext context) {
@@ -96,13 +92,6 @@ class LoginScreen extends StatelessWidget {
                                                     ?.copyWith(
                                                         color: theme.colorScheme
                                                             .onSurfaceVariant)),
-                                            if (onDemo != null)
-                                              OutlinedButton.icon(
-                                                  onPressed: onDemo,
-                                                  icon: const Icon(Icons
-                                                      .play_circle_outline),
-                                                  label: const Text(
-                                                      'Explore the demo')),
                                             if (error != null) ...[
                                               const SizedBox(height: 20),
                                               Text(error!,

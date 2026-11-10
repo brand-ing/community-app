@@ -41,7 +41,10 @@ void main() {
     await tester.ensureVisible(find.text('View details'));
     await tester.tap(find.text('View details'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Example listing. Contact and sign-up'),
+    expect(
+        find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.textContaining('Contact and sign-up')),
         findsOneWidget);
     await tester.tap(find.text('Back to listings'));
     await tester.pumpAndSettle();
@@ -63,12 +66,14 @@ void main() {
     await tester.pump();
     await tester.tap(find.byTooltip('Send message'));
     await tester.pumpAndSettle();
-    expect(find.text('I need help with gardening'), findsOneWidget);
     expect(
         find.byWidgetPredicate((widget) =>
             widget is SelectableText &&
             (widget.data?.contains('What kind of support') ?? false)),
         findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, 1000));
+    await tester.pumpAndSettle();
+    expect(find.text('I need help with gardening'), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
         isEmpty);
     expect(tester.takeException(), isNull);
@@ -107,15 +112,17 @@ void main() {
         await tester.ensureVisible(find.text('Community'));
         await tester.tap(find.text('Community'));
         await tester.pumpAndSettle();
-        expect(find.text('Progress Over Perfection'), findsOneWidget);
+        expect(find.text('Community posts are not available yet.'),
+            findsOneWidget);
         await tester.pageBack();
         await tester.pumpAndSettle();
         expect(find.text('Quick money options'), findsNothing);
-        expect(find.text('Chat with Angel'), findsNothing);
+        expect(find.text('Chat with Angel'), findsOneWidget);
         await tester.ensureVisible(find.text('I want to volunteer'));
         await tester.tap(find.text('I want to volunteer'));
         await tester.pumpAndSettle();
-        expect(find.text('Volunteer offerings'), findsOneWidget);
+        expect(
+            find.text('Sign in to view volunteer listings.'), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.pageBack();
         await tester.pumpAndSettle();
@@ -123,13 +130,16 @@ void main() {
         await tester.tap(find.text('I need help'));
         await tester.pumpAndSettle();
         expect(
-            find.text('How can I help you today, neighbor?'), findsOneWidget);
-        await tester.pageBack();
+            find.textContaining('Angel chat for guests is not available yet.'),
+            findsOneWidget);
+        expect(find.byType(HomeScreen), findsOneWidget);
+        await tester.tap(find.byTooltip('New conversation'));
         await tester.pumpAndSettle();
         await tester.ensureVisible(find.text('Service Exchange'));
         await tester.tap(find.text('Service Exchange'));
         await tester.pumpAndSettle();
-        expect(find.text('A skill for a skill.'), findsOneWidget);
+        expect(find.text('Service exchanges are not available yet.'),
+            findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }
@@ -151,7 +161,7 @@ class TestApi extends ApiService {
             'time': 'Weekends',
             'location': 'Atlanta',
             'description': 'Fictional test offering',
-            'isDemo': true
+            'isDemo': false
           }
       ];
   @override

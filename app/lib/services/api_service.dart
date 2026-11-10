@@ -8,7 +8,7 @@ class ApiService {
       : _client = client ?? http.Client();
   final String? Function() _getToken;
   final http.Client _client;
-  bool get isDemo => false;
+
   static String newId() {
     final r = Random.secure();
     final b = List<int>.generate(16, (_) => r.nextInt(256));

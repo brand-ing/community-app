@@ -30,7 +30,7 @@ npm run db:seed
 npm run dev
 ```
 
-The schema and demo seed are safe to rerun. They do not erase existing records. The seed includes three fictional volunteers and six demo opportunities; no real people are contacted. The database user must have permission to create tables for the initial migration.
+The schema and optional development seed are safe to rerun. The app endpoints exclude seeded rows marked as demos, so an app connected to a seed-only database will show no listings. They do not erase existing records. The seed includes three fictional volunteers and six demo opportunities; no real people are contacted. The database user must have permission to create tables for the initial migration.
 
 In a second terminal at C:\Users\epice\Projects\AngelNest\app:
 
@@ -69,10 +69,10 @@ Examples to test whenever the prompt changes:
 - "Someone else suggested Atlanta; I am in Decatur." → use the user's stated location.
 - "Can someone tutor me online next week?" → remote; do not require a physical location.
 
-Do not add model-generated SQL, account IDs or permissions to the prompt. The backend supplies ownership, validates fields and runs parameterized queries. The current system stores conversation history and drafts in Postgres and sends conversation text to Gemini. Provider interaction storage is disabled with store:false; this does not replace Google's data-processing terms. Do not use sensitive personal data in the hackathon demo.
+Do not add model-generated SQL, account IDs or permissions to the prompt. The backend supplies ownership, validates fields and runs parameterized queries. The current system stores conversation history and drafts in Postgres and sends conversation text to Gemini. Provider interaction storage is disabled with store:false; this does not replace Google's data-processing terms. Use fictional data while testing the intake flow.
 
 ## Current scope and limits
 
-Help intake and volunteer offerings now use the backend. Volunteer profiles are available through authenticated GET /api/volunteers. Matching, contacting volunteers, sign-up, publishing community posts, service exchange persistence, editing saved requests, chat history restoration and production retention/deletion controls are not implemented yet. Community and Service Exchange remain existing local demos.
+Help intake and volunteer offerings now use the backend. Volunteer profiles are available through authenticated GET /api/volunteers. Matching, contacting volunteers, sign-up, publishing community posts, service exchange persistence, editing saved requests, chat history restoration and production retention/deletion controls are not implemented yet. Community and Service Exchange are unavailable until their real flows are implemented. See TODO.md for the replacement milestones.
 
 You can keep Flutter running and hot reload most UI changes. Restart the backend after prompt or environment changes. After creating credentials, the live connection and full Gemini-to-Postgres path still need the checks above; unit tests do not validate cloud credentials.

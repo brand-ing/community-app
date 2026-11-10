@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import '../utils/display_name.dart';
 import '../services/api_service.dart';
+
 import '../theme/angel_theme.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class AngelChatScreen extends StatefulWidget {
   const AngelChatScreen(
-      {super.key, this.userName, required this.api, this.initialMessage});
+      {super.key,
+      this.userName,
+      required this.api,
+      this.initialMessage,
+      this.embedded = false});
   final ApiService api;
   final String? userName;
   final String? initialMessage;
+
+  final bool embedded;
 
   @override
   State<AngelChatScreen> createState() => _AngelChatScreenState();
@@ -19,14 +26,13 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
   final _composer = TextEditingController();
   final _scroll = ScrollController();
   final _messages = <({bool fromAngel, String text})>[];
-  final _conversationId = ApiService.newId();
+  final String _conversationId = ApiService.newId();
   String? _turnId;
   String? _pending;
   String? _error;
   Map<String, dynamic>? _response;
   bool _busy = false;
   bool _saved = false;
-
   @override
   void initState() {
     super.initState();
@@ -48,6 +54,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
     if (message.isEmpty) return;
     setState(() {
       _busy = true;
+
       _error = null;
       if (_pending == null) {
         if (_messages.isEmpty) {
@@ -75,6 +82,10 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+    _scrollToLatest();
+  }
+
+  void _scrollToLatest() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _scroll.hasClients) {
         _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -86,6 +97,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
   Future<void> _confirm() async {
     setState(() {
       _busy = true;
+
       _error = null;
     });
     try {
@@ -103,9 +115,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
     final draft = _response!['draft'] as Map<String, dynamic>;
     final missing = _response!['missingFields'] as List<dynamic>;
     return ExpansionTile(
-        title: Text(_saved
-            ? (widget.api.isDemo ? 'Demo request complete' : 'Request saved')
-            : 'Review your request'),
+        title: Text(_saved ? 'Request saved' : 'Review your request'),
         children: [
           Padding(
               padding: const EdgeInsets.all(16),
@@ -133,13 +143,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
                                 _pending == null
                             ? _confirm
                             : null,
-                        child: Text(_saved
-                            ? (widget.api.isDemo
-                                ? 'Completed in this demo'
-                                : 'Saved to Angel’s Nest')
-                            : (widget.api.isDemo
-                                ? 'Confirm demo request'
-                                : 'Confirm request'))),
+                        child: Text(_saved ? 'Saved' : 'Confirm request')),
                   ])),
         ]);
   }
@@ -157,9 +161,11 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
     final colors = theme.colorScheme;
     final palette = NestPalette.of(context);
     return Scaffold(
-      appBar: AppBar(
-          title: const Text('Chat with Angel'),
-          actions: const [ThemeToggleButton()]),
+      appBar: widget.embedded
+          ? null
+          : AppBar(
+              title: const Text('Chat with Angel'),
+              actions: const [ThemeToggleButton()]),
       body: SafeArea(
           child: Center(
               child: ConstrainedBox(
@@ -322,9 +328,7 @@ class _AngelChatScreenState extends State<AngelChatScreen> {
           Padding(
               padding: const EdgeInsets.only(bottom: 16, left: 24, right: 24),
               child: Text(
-                  widget.api.isDemo
-                      ? 'Demo conversation · Scripted replies, no live Gemini or database. Nothing is published; resets when you reload.'
-                      : 'Angel uses Google Gemini. Conversation drafts are saved for your account. Avoid private addresses or sensitive information.',
+                  'Messages are sent to Angel to prepare a help request. Review it before confirming.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: colors.onSurfaceVariant))),
