@@ -1,0 +1,77 @@
+name: Deploy Flutter to Netlify
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Build only, create a Netlify preview, or publish to production
+        required: true
+        type: choice
+        default: build
+        options:
+          - build
+          - preview
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze --no-pub
+      - run: flutter test --no-pub
+      - run: flutter build web --release --no-pub
+      - uses: actions/upload-artifact@v6
+        with:
+          name: angels-nest-web
+          path: app/build/web/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && inputs.mode != 'build'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: angels-nest-netlify
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: angels-nest-web
+          path: web
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Install Netlify CLI
+        run: npm install --global netlify-cli@27.17.0
+      - name: Deploy to existing project
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+          DEPLOY_MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$NETLIFY_AUTH_TOKEN" || -z "$NETLIFY_SITE_ID" ]]; then
+            echo "::error::Set NETLIFY_AUTH_TOKEN as an Actions secret and NETLIFY_SITE_ID as an Actions variable."
+            exit 1
+          fi
+          case "$DEPLOY_MODE" in
+            preview) netlify deploy --no-build --dir=web ;;
+            production) netlify deploy --no-build --dir=web --prod ;;
+            *) echo "::error::Unsupported deploy mode"; exit 1 ;;
+          esac

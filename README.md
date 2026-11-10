@@ -17,7 +17,7 @@ Open http://localhost:3000 and choose **Continue to the app**. Guests can explor
 
 Guest Angel chat, Service Exchange, and Community show their current availability. With optional Auth0 sign-in and a configured backend, the existing inline help intake and database-backed volunteer listings are accessible. Those cloud paths have not been live-verified. Gemini journey routing is in progress.
 
-From the app directory, use `flutter test`, `flutter analyze`, or `flutter build web`. The web build goes to `app/build/web` relative to the repository root. Building locally does not deploy the website.
+From the app directory, use `flutter test`, `flutter analyze`, or `flutter build web`. The web build goes to `app/build/web` relative to the repository root. Building locally does not deploy the website. See the [Netlify deployment guide](docs/deploy-netlify.md) for manual upload and GitHub Actions.
 
 See the [backend setup guide](docs/backend-gemini-tigerdata.md) for credentials, schemas, and prompts.
 
